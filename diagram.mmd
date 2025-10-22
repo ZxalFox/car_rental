@@ -1,0 +1,46 @@
+erDiagram
+    CUSTOMER ||--o{ RENTAL : "faz"
+    CAR ||--o{ RENTAL : "é alugado em"
+
+    CAR {
+        uuid id PK "Identificador único"
+        string plate "Placa única do veículo"
+        string brand "Marca do veículo"
+        string model "Modelo do veículo"
+        integer year "Ano de fabricação"
+        decimal daily_rate "Preço por dia de locação"
+        string color "Cor do veículo"
+        integer odometer "Quilometragem atual"
+        boolean is_active "Disponível para locação"
+        datetime created_at "Data de criação do registro"
+        datetime updated_at "Data da última atualização"
+    }
+
+    CUSTOMER {
+        uuid id PK "Identificador único do cliente"
+        string full_name "Nome completo do cliente"
+        string email "E-mail único do cliente"
+        string document "CPF ou ID único do cliente"
+        string phone "Número de telefone do cliente"
+        date birth_date "Data de nascimento do cliente"
+        datetime created_at "Data de criação do registro"
+        datetime updated_at "Data da última atualização"
+    }
+
+    RENTAL {
+        uuid id PK "Identificador único do aluguel"
+        uuid car_id FK "Referência ao carro alugado"
+        uuid customer_id FK "Referência ao cliente"
+        date start_date "Data de início do aluguel"
+        date end_date "Data de término do aluguel"
+        decimal total_price "Preço total do aluguel"
+        decimal agreed_daily_rate "Valor acordado por dia"
+        integer odometer_start "Quilometragem no início do aluguel"
+        integer odometer_end "Quilometragem no final do aluguel"
+        string status "Status do aluguel: reserved|ongoing|finished|canceled"
+        string pickup_location "Local de retirada do veículo"
+        string return_location "Local de devolução do veículo"
+        text notes "Notas adicionais sobre o aluguel"
+        datetime created_at "Data de criação do registro"
+        datetime updated_at "Data da última atualização"
+    }
