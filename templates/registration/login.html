@@ -1,12 +1,17 @@
-{% extends "base.html" %} {% block title %}Entrar · Car Rental{% endblock %} {%
-block content %}
+{% extends "base.html" %}
+
+{% block title %}Entrar · Car Rental{% endblock %}
+
+{% block content %}
 <section>
-  <h2>Acessar o sistema</h2>
-  <form method="post">
-    {% csrf_token %} {% if next %}
-    <input type="hidden" name="next" value="{{ next }}" />
-    {% endif %} {{ form.as_p }}
-    <button type="submit">Entrar</button>
-  </form>
+    <h2>Acessar o sistema</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+        {{ form.as_p }}
+        <button type="submit">Entrar</button>
+    </form>
 </section>
 {% endblock %}
