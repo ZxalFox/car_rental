@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Car Rental{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    <style>
+      body {
+        margin: 0 auto;
+        max-width: 960px;
+        padding: 2rem 1rem;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+      nav ul {
+        display: flex;
+        gap: 1rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .messages {
+        margin-bottom: 1.5rem;
+      }
+      .messages li {
+        list-style: none;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+      }
+      .messages li.success {
+        background: #e7f5ef;
+        color: #2f7a47;
+      }
+      .messages li.error {
+        background: #fdecea;
+        color: #b13d2c;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1><a href="{% url 'rental:dashboard' %}">Car Rental</a></h1>
+      <nav>
+        <ul>
+          {% if user.is_authenticated %}
+          <li>
+            <a href="{% url 'rental:rental_create' %}" role="button"
+              >Nova reserva</a
+            >
+          </li>
+          <li><a href="{% url 'logout' %}">Sair</a></li>
+          {% else %}
+          <li><a href="{% url 'login' %}">Entrar</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li class="{{ message.tags|default:'info' }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>

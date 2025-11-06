@@ -1,6 +1,8 @@
 import uuid
-from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.db import models
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,19 +28,29 @@ class Car(TimeStampedModel):
     def __str__(self):
         return f"{self.plate} - {self.brand} {self.model}/{self.year}"
 
-class Customer(TimeStampedModel):
+class Customer(AbstractUser, TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     full_name = models.CharField("Nome completo", max_length=120)
-    email = models.EmailField(unique=True)
+    email = models.EmailField("Email", unique=True)
     document = models.CharField("Documento (CPF/ID)", max_length=20, unique=True)
     phone = models.CharField("Telefone", max_length=20, blank=True)
     birth_date = models.DateField("Data de nascimento", null=True, blank=True)
+
+    USERNAME_FIELD = "username"
+    EMAIL_FIELD = "email"
+    REQUIRED_FIELDS = ["email", "full_name", "document"]
 
     class Meta:
         ordering = ["full_name"]
 
     def __str__(self):
+        return self.full_name or self.username
+
+    def get_full_name(self):
         return self.full_name
+
+    def get_short_name(self):
+        return self.full_name.split(" ")[0] if self.full_name else self.username
 
 class RentalStatus(models.TextChoices):
     RESERVED = "reserved", "Reservada"
@@ -70,7 +82,30 @@ class Rental(TimeStampedModel):
     def __str__(self):
         return f"{self.car.plate} - {self.customer.full_name} ({self.start_date} → {self.end_date})"
 
+    @staticmethod
+    def has_conflict(*, car: Car, start, end, exclude_id=None):
+        """Return True when there is an overlapping rental for the same car."""
+        conflict_statuses = [RentalStatus.RESERVED, RentalStatus.ONGOING]
+        query = Rental.objects.filter(
+            car=car,
+            status__in=conflict_statuses,
+            start_date__lt=end,
+            end_date__gt=start,
+        )
+        if exclude_id:
+            query = query.exclude(pk=exclude_id)
+        return query.exists()
+
+    def clean(self):
+        super().clean()
+        if self.start_date and self.end_date and self.start_date >= self.end_date:
+            raise ValidationError({"end_date": "A data de término deve ser posterior ao início."})
+        if self.car and self.start_date and self.end_date:
+            if Rental.has_conflict(car=self.car, start=self.start_date, end=self.end_date, exclude_id=self.pk):
+                raise ValidationError("Este carro já possui reserva nesse período.")
+
     def save(self, *args, **kwargs):
+        self.full_clean()
         if self.start_date and self.end_date and self.agreed_daily_rate:
             days = (self.end_date - self.start_date).days
             if days > 0:

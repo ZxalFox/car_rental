@@ -1,0 +1,67 @@
+{% extends "base.html" %} {% block title %}Painel · Car Rental{% endblock %} {%
+block content %}
+<section>
+  <h2>Olá, {{ user.full_name|default:user.username }}!</h2>
+  <p>Gerencie suas reservas e encontre veículos disponíveis.</p>
+  <p>
+    <a href="{% url 'rental:rental_create' %}" role="button">Nova reserva</a>
+  </p>
+</section>
+
+<section>
+  <h3>Minhas reservas</h3>
+  {% if my_rentals %}
+  <table>
+    <thead>
+      <tr>
+        <th>Carro</th>
+        <th>Período</th>
+        <th>Status</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rental in my_rentals %}
+      <tr>
+        <td>
+          {{ rental.car.brand }} {{ rental.car.model }} ({{ rental.car.plate }})
+        </td>
+        <td>{{ rental.start_date }} → {{ rental.end_date }}</td>
+        <td>{{ rental.get_status_display }}</td>
+        <td>R$ {{ rental.total_price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Você ainda não possui reservas. Experimente criar a primeira.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h3>Carros disponíveis</h3>
+  {% if available_cars %}
+  <div class="grid">
+    {% for car in available_cars %}
+    <article>
+      <header>
+        <strong>{{ car.brand }} {{ car.model }}</strong>
+        <p>Placa {{ car.plate }} · Ano {{ car.year }}</p>
+      </header>
+      <p>Diária: R$ {{ car.daily_rate }}</p>
+      <p>Quilometragem: {{ car.odometer }} km</p>
+      <footer>
+        <a
+          href="{% url 'rental:rental_create' %}?car={{ car.id }}"
+          role="button"
+          >Reservar</a
+        >
+      </footer>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>Não há veículos ativos no momento.</p>
+  {% endif %}
+</section>
+{% endblock %}

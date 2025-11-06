@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
 from .models import Car, Customer, Rental
 
 @admin.register(Car)
@@ -8,9 +10,39 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = ("plate", "brand", "model")
 
 @admin.register(Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("full_name", "email", "document", "phone")
-    search_fields = ("full_name", "email", "document")
+class CustomerAdmin(UserAdmin):
+    fieldsets = UserAdmin.fieldsets + (
+        (
+            "Informações adicionais",
+            {
+                "fields": (
+                    "full_name",
+                    "document",
+                    "phone",
+                    "birth_date",
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (
+            "Informações adicionais",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "full_name",
+                    "document",
+                    "phone",
+                    "birth_date",
+                ),
+            },
+        ),
+    )
+    list_display = ("username", "full_name", "email", "document", "is_active")
+    search_fields = ("username", "full_name", "email", "document")
+    readonly_fields = ("created_at", "updated_at")
 
 @admin.register(Rental)
 class RentalAdmin(admin.ModelAdmin):

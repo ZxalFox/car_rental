@@ -18,6 +18,8 @@ INSTALLED_APPS = [
     "rental",
 ]
 
+AUTH_USER_MODEL = "rental.Customer"
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -48,16 +50,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "car_rental"),
-        "USER": os.getenv("DB_USER", "car_rental"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "car_rental"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.postgresql")
+
+if DB_ENGINE == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.getenv("DB_NAME", BASE_DIR / "db.sqlite3"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.getenv("DB_NAME", "car_rental"),
+            "USER": os.getenv("DB_USER", "car_rental"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "car_rental"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -75,3 +87,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "rental:dashboard"
+LOGOUT_REDIRECT_URL = "login"

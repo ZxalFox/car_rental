@@ -1,12 +1,11 @@
-from rest_framework.routers import DefaultRouter
-from .views import CarViewSet, CustomerViewSet, RentalViewSet
-from django.urls import path, include
+from django.urls import include, path
 
-router = DefaultRouter()
-router.register(r"cars", CarViewSet)
-router.register(r"customers", CustomerViewSet)
-router.register(r"rentals", RentalViewSet)
+from . import views
+
+app_name = "rental"
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("", views.DashboardView.as_view(), name="dashboard"),
+    path("rentals/nova/", views.RentalCreateView.as_view(), name="rental_create"),
+    path("api/", include("rental.api_urls")),
 ]
