@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "rental",
 ]
@@ -22,6 +23,7 @@ AUTH_USER_MODEL = "rental.Customer"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -86,7 +88,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
 }
+
+
+def _split_env_list(value, default):
+    items = value.split(",") if value else default.split(",")
+    return [item.strip() for item in items if item.strip()]
+
+
+_default_cors = "http://localhost:8001,http://127.0.0.1:8001"
+_cors_env = os.getenv("CORS_ALLOWED_ORIGINS", "")
+CORS_ALLOWED_ORIGINS = _split_env_list(_cors_env, _default_cors)
+CORS_ALLOW_CREDENTIALS = True
+
+_default_csrf = "http://localhost:8001,http://127.0.0.1:8001"
+_csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = _split_env_list(_csrf_env, _default_csrf)
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "rental:dashboard"

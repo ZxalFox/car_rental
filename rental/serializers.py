@@ -62,9 +62,36 @@ class CustomerSerializer(serializers.ModelSerializer):
         }
 
 class RentalSerializer(serializers.ModelSerializer):
+    car_detail = CarSerializer(source="car", read_only=True)
+
     class Meta:
         model = Rental
-        fields = "__all__"
+        fields = (
+            "id",
+            "car",
+            "customer",
+            "start_date",
+            "end_date",
+            "agreed_daily_rate",
+            "total_price",
+            "odometer_start",
+            "odometer_end",
+            "pickup_location",
+            "return_location",
+            "status",
+            "notes",
+            "created_at",
+            "updated_at",
+            "car_detail",
+        )
+        read_only_fields = (
+            "id",
+            "customer",
+            "total_price",
+            "created_at",
+            "updated_at",
+            "car_detail",
+        )
 
     def validate(self, attrs):
         start = attrs.get("start_date") or getattr(self.instance, "start_date", None)
