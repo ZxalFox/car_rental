@@ -30,3 +30,7 @@
 - **Autenticação pronta para uso**: rotas padrão do Django em `/accounts/login` e `/accounts/logout`, com redirecionamento automático para o painel. O modelo `Customer` continua sendo a tabela de usuários e recebe os dados de autenticação.
 - **Regra de negócio centralizada**: a classe `Rental` garante que um carro não possa ser reservado em períodos que se sobreponham (usada na API, formulário e model `clean()`). O valor total é calculado automaticamente com base na diária e na duração.
 - **API REST isolada**: os endpoints continuam disponíveis em `/api/cars/`, `/api/customers/` e `/api/rentals/`, definidos em `rental/api_urls.py`.
+
+## Documentação Adicional
+
+- [Comparativo Técnico: Django Templates vs Gatsby](docs/comparison_django_gatsby.md): Uma análise detalhada das diferenças arquiteturais e de experiência entre as duas abordagens implementadas neste projeto.
